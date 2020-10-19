@@ -1,1 +1,1 @@
-web: python exercise/favretweet.py --log-file -
+web: python exercise/favretweet.py
