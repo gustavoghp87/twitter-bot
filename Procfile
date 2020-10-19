@@ -1,1 +1,1 @@
-web: python /exercise/favretweet.py
+web: python exercise/favretweet.py
