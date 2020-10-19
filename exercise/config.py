@@ -11,7 +11,7 @@ def create_api():
     consumer_secret = config("api_secret")
     access_token = config("token_public")
     access_token_secret = config("token_secret")
-    print(consumer_key, consumer_secret, access_token, access_token_secret)
+    # print(consumer_key, consumer_secret, access_token, access_token_secret)
 
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
