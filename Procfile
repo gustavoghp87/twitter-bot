@@ -1,1 +1,1 @@
-worker: python exercise/favretweet.py
+worker: heroku run python exercise/favretweet.py
