@@ -1,7 +1,7 @@
 import tweepy
 import logging
 from config import create_api
-import json
+#import json
 
 
 logging.basicConfig(level=logging.INFO)
@@ -14,14 +14,18 @@ class FavRetweetListener(tweepy.StreamListener):
 
     def on_status(self, tweet):
         logger.info(f"Processing tweet id {tweet.id}")
-        #if tweet.in_reply_to_status_id is not None or \
-        #    tweet.user.id == self.me.id:
+        if tweet.in_reply_to_status_id is not None or \
+            tweet.user.id == self.me.id:
             # This tweet is a reply or I'm its author so, ignore it
-        #    return
+            return            
+
         if not tweet.favorited:
             # Mark it as Liked, since we have not done it yet
             try:
                 tweet.favorite()
+                user = str(tweet).split("screen_name': '")[1].split("'")[0]
+                print(f"Enviando mensaje a @{user}")
+                self.api.update_status(f"Lo tuyo es 100% barrani", tweet.id)
             except Exception as e:
                 logger.error("Error on fav", exc_info=True)
         #if not tweet.retweeted:

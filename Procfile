@@ -1,1 +1,1 @@
-worker: python exercise/favretweet.py
+worker: python bot-args/favretweet.py

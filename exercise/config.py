@@ -3,7 +3,6 @@ import logging
 import os
 from decouple import config
 
-
 logger = logging.getLogger()
 
 def create_api():
