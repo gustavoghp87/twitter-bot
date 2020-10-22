@@ -3,12 +3,13 @@ import logging
 from config import create_api
 import sys
 import os
+import requests
 
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
 
-class FavRetweetListener1(tweepy.StreamListener):
+class FavRetweetListener(tweepy.StreamListener):
     def __init__(self, api):
         self.api = api
         self.me = api.me()
@@ -27,18 +28,32 @@ class FavRetweetListener1(tweepy.StreamListener):
                 id = str(tweet).split("id': ")[1].split(',')[0]
                 print(f"\n\nFaveado tuit {id} de @{user}")
             except Exception as e:
-                logger.error("Error on fav", exc_info=True)
+                #logger.error("Error on fav", exc_info=True)
+                print("Ya faveado")
 
             try:
                 text = str(tweet).split("text': '")[1].split("'")[0]
                 print(text)
-                if 'maslazoom' in text:
-                    user = str(tweet).split("screen_name': '")[1].split("'")[0]
-                    id = str(tweet).split("id': ")[1].split(',')[0]
+                user = str(tweet).split("screen_name': '")[1].split("'")[0]
+                id = str(tweet).split("id': ")[1].split(',')[0]
+
+                if 'maslazoom' in text.lower():
                     print(f"\n\nEnviando mensaje a @{user}, id {id}, por el tuit {text}")
                     self.api.update_status(f"@{user} El listado de todos los maslazooms está en maslabook.com/maslazoom, saludos", id)
-            except Exception:
-                logger.error("No tiene maslazoom")
+
+                # if 'toalla' in text.lower() or 'toallin' in text.lower() or 'toallín' in text.lower():
+                #     print(f"\n\nEnviando mensaje a @{user}, id {id}, por el tuit {text}")
+                #     filename = 'temp.jpg'
+                #     request = requests.get("https://i.pinimg.com/originals/40/a1/91/40a191c06187848f0a2070ad68555564.jpg", stream=True)
+                #     if request.status_code == 200:
+                #         with open(filename, 'wb') as image:
+                #             for chunk in request:
+                #                 image.write(chunk)
+                #         self.api.update_with_media(filename, status=f"@{user} no olvides llevar una toalla")
+                #         os.remove(filename)
+
+            except Exception as e:
+                logger.error("Error enviando mensaje", e)
 
         #if not tweet.retweeted:
             # Retweet, since we have not retweeted it yet
@@ -54,15 +69,10 @@ class FavRetweetListener1(tweepy.StreamListener):
 def main():
     api = create_api()
 
-    keywords1 = ["barranis", "barrani, maslazoom, maslazooms"]
-    tweets_listener1 = FavRetweetListener1(api)
-    stream1 = tweepy.Stream(api.auth, tweets_listener1)
-    stream1.filter(track=keywords1, languages=["es"])
-
-    # keywords2 = ["maslazoom", "maslazooms"]
-    # tweets_listener2 = FavRetweetListener2(api)
-    # stream2 = tweepy.Stream(api.auth, tweets_listener2)
-    # stream2.filter(track=keywords2, languages=["es"])
+    keywords = ["barranis", "barrani", "Barrani", "maslazoom", "maslazooms", "MaslaZoom", "Maslazoom", "MASLAZOOM"]
+    tweets_listener = FavRetweetListener(api)
+    stream = tweepy.Stream(api.auth, tweets_listener)
+    stream.filter(track=keywords, languages=["es"])
 
     #del keywords[0]
     #print("args:", str(keywords))
