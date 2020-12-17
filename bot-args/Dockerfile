@@ -6,6 +6,7 @@ RUN apk add --no-cache python3-dev \
 COPY config.py /bots/
 COPY favretweet.py /bots/
 COPY requirements.txt /tmp
+COPY .env /bots/
 
 RUN pip3 install -r /tmp/requirements.txt
 
