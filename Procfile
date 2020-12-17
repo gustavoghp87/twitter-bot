@@ -1,1 +1,1 @@
-worker: python bot-args/favretweet.py
+worker: python favretweet.py
