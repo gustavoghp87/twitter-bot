@@ -2,6 +2,9 @@ from logging import log
 import tweepy
 import logging
 from config import create_api
+from decouple import config
+import pymongo
+import time
 
 
 logging.basicConfig(level=logging.INFO)
@@ -13,24 +16,36 @@ class FavRetweetListener(tweepy.StreamListener):
         self.me = api.me()
 
     def on_status(self, tweet):
+
         logger.info(f"Processing tweet id {tweet.id}")
+
         if tweet.in_reply_to_status_id is not None or \
             tweet.user.id == self.me.id:
             print("This tweet is a reply or I'm its author so, ignore it")
             return
+
         if not tweet.favorited:
+            connect = "mongodb+srv://maslabook-bot7200:" + config('ATLAS_DB') + "@cluster0.mykp7.mongodb.net/bot7200?retryWrites=true&w=majority"
+            myclient = pymongo.MongoClient(connect)
+            mydb = myclient["bots"]
+            mycol = mydb["bot-fav"]
+            myJson = {}
+            myJson["time"] = f"{time.asctime(time.localtime(time.time()))}"
             # Mark it as Liked, since we have not done it yet
             try:
                 tweet.favorite()
                 user = str(tweet).split("screen_name': '")[1].split("'")[0]
                 id = str(tweet).split("id': ")[1].split(',')[0]
                 print(f"\n\nFaveado tuit {id} de @{user}")
+                myJson["tuit"] = f"Faveado tuit {id} de @{user}"
             except Exception as e:
                 #logger.error("Error on fav", exc_info=True)
                 print("Ya faveado")
+                myJson["tuit"] = f"Ya faveado tuit {id} de @{user}"
 
             try:
                 text = str(tweet).split("text': '")[1].split("'")[0]
+                myJson["tuit"] = text
                 print(text)
                 user = str(tweet).split("screen_name': '")[1].split("'")[0]
                 id = str(tweet).split("id': ")[1].split(',')[0]
@@ -38,6 +53,7 @@ class FavRetweetListener(tweepy.StreamListener):
                 if 'maslazoom' in text.lower():
                     print(f"\n\nEnviando mensaje a @{user}, id {id}, por el tuit {text}")
                     self.api.update_status(f"@{user} El listado de todos los maslazooms está en maslabook.com/maslazoom, saludos", id)
+                    myJson["maslazoom"] = "enviado"
 
                 # if 'toalla' in text.lower() or 'toallin' in text.lower() or 'toallín' in text.lower():
                 #     print(f"\n\nEnviando mensaje a @{user}, id {id}, por el tuit {text}")
@@ -52,6 +68,9 @@ class FavRetweetListener(tweepy.StreamListener):
 
             except Exception as e:
                 logger.error("Error enviando mensaje", e)
+                myJson["error"] = e
+
+            mycol.insert_one(myJson)
 
         #if not tweet.retweeted:
             # Retweet, since we have not retweeted it yet
@@ -70,7 +89,7 @@ def main():
     keywords = ["barranis", "barrani", "Barrani", "maslazoom", "maslazooms", "MaslaZoom", "Maslazoom", "MASLAZOOM"]
     tweets_listener = FavRetweetListener(api)
     stream = tweepy.Stream(api.auth, tweets_listener)
-    stream.filter(track=keywords, languages=["es"])
+    stream.filter(track=keywords, languages=["es", "en"])
 
     #del keywords[0]
     #print("args:", str(keywords))
