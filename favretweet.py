@@ -25,7 +25,7 @@ class FavRetweetListener(tweepy.StreamListener):
             return
 
         if not tweet.favorited:
-            connect = "mongodb+srv://maslabook-bot7200:" + config('ATLAS_DB') + "@cluster0.mykp7.mongodb.net/bot7200?retryWrites=true&w=majority"
+            connect = config('ATLAS_DB')
             myclient = pymongo.MongoClient(connect)
             mydb = myclient["bots"]
             mycol = mydb["bot-fav"]
