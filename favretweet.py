@@ -41,7 +41,6 @@ class FavRetweetListener(tweepy.StreamListener):
             except Exception as e:
                 #logger.error("Error on fav", exc_info=True)
                 print("Ya faveado")
-                myJson["tuit"] = f"Ya faveado tuit {id} de @{user}"
 
             try:
                 text = str(tweet).split("text': '")[1].split("'")[0]
