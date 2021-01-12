@@ -36,7 +36,7 @@ class FavRetweetListener(tweepy.StreamListener):
                 user = str(tweet).split("screen_name': '")[1].split("'")[0]
                 id = str(tweet).split("id': ")[1].split(',')[0]
 
-                if 'maslazoom' in text.lower():
+                if 'maslazoom' in text.lower() and 'listado de todos los maslazooms' not in text.lower():
                     print(f"\n\nEnviando mensaje a @{user}, id {id}, por el tuit {text}")
                     self.api.update_status(f"@{user} El listado de todos los maslazooms está en maslabook.com/maslazoom, saludos", id)
 
